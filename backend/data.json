@@ -1,0 +1,167 @@
+
+{
+    "mockOrders" : [
+    {
+      "id": "1234",
+      "client": "Grand Plaza Hotel",
+      "clienttype": "hotel",
+      "items": 45,
+      "status": "pending",
+      "date": "2025-03-15",
+      "address": "123 Main Street, Downtown, NY 10001",
+      "contactPerson": "John Smith",
+      "contactNumber": "212-555-1234"
+    },
+    {
+      "id": "1235",
+      "client": "City General Hospital",
+      "clienttype": "hospital",
+      "items": 78,
+      "status": "picked_up",
+      "date": "2025-03-15",
+      "address": "456 Park Avenue, Midtown, NY 10022",
+      "contactPerson": "Sarah Johnson",
+      "contactNumber": "212-555-5678"
+    },
+    {
+      "id": "1236",
+      "client": "Luxe Salon & Spa",
+      "clienttype": "salon",
+      "items": 22,
+      "status": "in_process",
+      "date": "2025-03-14",
+      "address": "789 Broadway, SoHo, NY 10012",
+      "contactPerson": "Michael Chen",
+      "contactNumber": "212-555-9012"
+    },
+    {
+      "id": "1237",
+      "client": "Riverside Medical Center",
+      "clienttype": "hospital",
+      "items": 63,
+      "status": "completed",
+      "date": "2025-03-14",
+      "address": "321 River Road, Westsde, NY 10023",
+      "contactPerson": "Emily Rodriguez",
+      "contactNumber": "212-555-3456"
+    },
+    {
+      "id": "1238",
+      "client": "Boutique Inn",
+      "clienttype": "hotel",
+      "items": 31,
+      "status": "pending",
+      "date": "2025-03-13",
+      "address": "555 Fifth Avenue, Uptown, NY 10024",
+      "contactPerson": "Dav Wilson",
+      "contactNumber": "212-555-7890"
+    },
+    {
+      "id": "1239",
+      "client": "Modern Styles",
+      "clienttype": "salon",
+      "items": 15,
+      "status": "completed",
+      "date": "2025-03-13",
+      "address": "888 Fashion Street, Garment District, NY 10018",
+      "contactPerson": "Lisa Kim",
+      "contactNumber": "212-555-2345"
+    },
+    {
+      "id": "1240",
+      "client": "Bays Hospital",
+      "clienttype": "hospital",
+      "items": 92,
+      "status": "in_process",
+      "date": "2025-03-12",
+      "address": "444 Bayse Drive, Eastse, NY 10028",
+      "contactPerson": "Robert Taylor",
+      "contactNumber": "212-555-6789"
+    },
+    {
+      "id": "1241",
+      "client": "Sunset Resort",
+      "clienttype": "hotel",
+      "items": 53,
+      "status": "picked_up",
+      "date": "2025-03-12",
+      "address": "777 Sunset Boulevard, Westse, NY 10023",
+      "contactPerson": "Amanda Brown",
+      "contactNumber": "212-555-0123"
+    }
+  ],
+"clients" : [
+    {
+      "business_name": "Grand Plaza Hotel",
+      "business_type": "hotel",
+      "business_address": "123 Main Street, Downtown, NY 10001",
+      "contactPerson": "John Smith",
+      "contactEmail": "jsmith@grandplaza.com",
+      "contactPhone": "212-555-1234",
+      "totalOrders": 87
+    },
+    {
+      "business_name": "City General Hospital",
+      "business_type": "hospital",
+      "business_address": "456 Park Avenue, Mtown, NY 10022",
+      "contactPerson": "Sarah Johnson",
+      "contactEmail": "sjohnson@citygeneral.org",
+      "contactPhone": "212-555-5678",
+      "totalOrders": 154
+    },
+    {
+      "business_name": "Luxe Salon & Spa",
+      "business_type": "salon",
+      "business_address": "789 Broadway, SoHo, NY 10012",
+      "contactPerson": "Michael Chen",
+      "contactEmail": "mchen@luxesalon.com",
+      "contactPhone": "212-555-9012",
+      "totalOrders": 42
+    },
+    {
+      "business_name": "Riverse Medical Center",
+      "business_type": "hospital",
+      "business_address": "321 River Road, Westse, NY 10023",
+      "contactPerson": "Emily Rodriguez",
+      "contactEmail": "erodriguez@riversemed.org",
+      "contactPhone": "212-555-3456",
+      "totalOrders": 132
+    },
+    {
+      "business_name": "Boutique Inn",
+      "business_type": "hotel",
+      "business_address": "555 Fifth Avenue, Uptown, NY 10024",
+      "contactPerson": "Dav Wilson",
+      "contactEmail": "dwilson@boutiqueinn.com",
+      "contactPhone": "212-555-7890",
+      "totalOrders": 65
+    },
+    {
+      "business_name": "Modern Styles",
+      "business_type": "salon",
+      "business_address": "888 Fashion Street, Garment District, NY 10018",
+      "contactPerson": "Lisa Kim",
+      "contactEmail": "lkim@modernstyles.com",
+      "contactPhone": "212-555-2345",
+      "totalOrders": 37
+    },
+    {
+      "business_name": "Bayse Hospital",
+      "business_type": "hospital",
+      "business_address": "444 Bayse Drive, Easts, NY 10028",
+      "contactPerson": "Robert Taylor",
+      "contactEmail": "rtaylor@baysehospital.org",
+      "contactPhone": "212-555-6789",
+      "totalOrders": 118
+    },
+    {
+      "business_name": "Sunset Resort",
+      "business_type": "hotel",
+      "business_address": "777 Sunset Boulevard, Westse, NY 10023",
+      "contactPerson": "Amanda Brown",
+      "contactEmail": "abrown@sunsetresort.com",
+      "contactPhone": "212-555-0123",
+      "totalOrders": 73
+    }
+    ]
+}
