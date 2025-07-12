@@ -28,6 +28,7 @@ import AddBusinessType from './pages/admin/AddBusinessType';
 import AddItemType from './pages/admin/AddItemType';
 import PlanManagement from './pages/admin/PlanTypeManagement';
 import AddPlanManagement from './pages/admin/AddPlanTypeManagement';
+import SubscriptionHistory from './pages/SubscriptionHistory';
 import Support from './pages/Support';
 import FAQ from './pages/FAQ';
 import { ToastContainer } from 'react-toastify'; // ✅ import
@@ -178,6 +179,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Delivery />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/subscription-history/" 
+              element={
+                <ProtectedRoute>
+                  <SubscriptionHistory />
                 </ProtectedRoute>
               } 
             />

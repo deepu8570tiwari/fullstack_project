@@ -214,7 +214,7 @@ function Dashboard() {
       </div>
 
       {/* Client Distribution & Performance Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+       {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
           <h2 className="font-semibold text-gray-800 dark:text-white mb-4">Client Distribution</h2>
           <div className="flex flex-col space-y-4">
@@ -280,8 +280,8 @@ function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div> */}
+    </div> 
   );
 }
 

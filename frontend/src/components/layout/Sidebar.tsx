@@ -13,7 +13,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   // Define navigation links based on user role
   const getNavigationLinks = () => {
     const baseLinks = [
-      { path: '/', label: 'Dashboard', icon: <Home size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college'] }
+      { path: '/', label: 'Dashboard', icon: <Home size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college',,'air-bnb','flat-owner'] }
     ];
 
     const roleBasedLinks = [
@@ -29,13 +29,13 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       { path: '/admin/items-type', label: 'Items Type', icon: <Users size={20} />, roles: ['admin'] },
       { path: '/delivery-person', label: 'Delivery Personnel', icon: <Truck size={20} />, roles: ['admin'] },
       
-      { path: '/subscription-plans', label: 'Subscription Plans', icon: <CreditCard size={20} />, roles: ['salon','hospital','hostel','college'] },
-      { path: '/payments', label: 'Payments', icon: <Wallet size={20} />, roles:['salon','hospital','hostel','college']},
+      { path: '/subscription-plans', label: 'Subscription Plans', icon: <CreditCard size={20} />, roles: ['salon','hospital','hostel','college','air-bnb','flat-owner'] },
+      { path: '/subscription-history', label: 'Subscription History', icon: <Wallet size={20} />, roles:['salon','hospital','hostel','college','air-bnb','flat-owner']},
       // Common links
-      { path: '/support', label: 'Support', icon: <MessageSquare size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college'] },
-      { path: '/faq', label: 'FAQ', icon: <HelpCircle size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college'] },
-      { path: '/profile', label: 'Profile', icon: <User size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college'] },
-      { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college'] }
+      { path: '/support', label: 'Support', icon: <MessageSquare size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
+      { path: '/faq', label: 'FAQ', icon: <HelpCircle size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
+      { path: '/profile', label: 'Profile', icon: <User size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
+      { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] }
     ];
 
     return [...baseLinks, ...roleBasedLinks].filter(link => 

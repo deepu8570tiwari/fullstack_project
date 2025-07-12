@@ -1,98 +1,137 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Save, Plus, Minus } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { X, Save, Minus, Plus } from 'lucide-react';
 import { jwtDecode } from 'jwt-decode';
+
+interface ItemsType {
+  _id: string;
+  items_type: string;
+  quantity: string;
+}
+
+interface BusinessType {
+  _id: string;
+  business_type: string;
+}
 
 interface LaundryItem {
   item_name: string;
   quantity: number;
 }
-type Client = {
-  _id: string;
-  business_name: string;
-};
-type businesstype={
-  _id: string;
-  business_type: string;
-}
-type itemstype={
-  _id: string;
-  items_type: string;
-}
+
 interface DecodedToken {
   id: string;
   email: string;
   exp: number;
   userId: string;
 }
-let delivery_person_id = '';
 
+// Define types for our orders
+type OrderStatus = 'picked_up' | 'completed' | 'in_process' | 'pending';
+
+interface Order {
+  id: string;
+  client: string;
+  clientType: 'hospital' | 'hotel' | 'salon';
+  items: number;
+  status: OrderStatus;
+  date: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  notes: string;
+  item_details: LaundryItem[];
+  userId: string;
+  delivery_person_id: string;
+  business_type: string;
+  pickup_time: string;
+  delivery_time: string;
+  business_name: string;
+}
+type Client = {
+  _id: string;
+  business_name: string;
+};
+interface EditOrderModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (updated: any) => void;
+  data: any;
+}
+
+let delivery_person_id = '';
 const token = localStorage.getItem('authToken');
 if (token) {
   const decoded = jwtDecode<DecodedToken>(token);
   delivery_person_id = decoded.userId;
 }
-function AddLaundry() {
- 
-  const navigate = useNavigate();
+
+function EditOrderModel({ isOpen, onClose, onSave, data }: EditOrderModalProps) {
+    if (!isOpen || !data) return null;
+console.log(data,'data_id')
+  const [formData, setFormData] = useState({
+    userId: data._id || '',
+    delivery_person_id: data.delivery_person_id?._id || delivery_person_id,
+    business_type: data.business_type || '',
+    pickup_time: data.pickup_time?.slice(0, 10) || '',
+    delivery_time: data.delivery_time?.slice(0, 10) || '',
+    business_name: data.userId?.business_name || '',
+    status: data.status,
+    notes: data.notes,
+    item_details: data.item_details || []
+  });
+console.log(formData.pickup_time,'pickup_time');
   const [loading, setLoading] = useState(false);
+  const [ItemsType, setItemsType] = useState<ItemsType[]>([]);
+  const [BusinessType, setBusinessType] = useState<BusinessType[]>([]);
   const [clientNames, setClientNames] = useState<Client[]>([]);
-  const [BusinessType,setBusinessType]=useState<businesstype[]>([]);
-  const [ItemsType,setItemsType]=useState<itemstype[]>([]);
-  const [item_details, setItem_details] = useState<LaundryItem[]>([
-    { item_name: '', quantity: 1}
-  ]);
-  
-   useEffect(()=>{
+  const [item_details, setItem_details] = useState<LaundryItem[]>(formData.item_details);
+
+  useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem('authToken');
       try {
-        const business_type = await fetch('http://localhost:8080/api/v1/business-type/', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
-        });
-        const business_type_response = await business_type.json();
-        setBusinessType(business_type_response.data);
+        const token = localStorage.getItem('authToken');
 
-        const items_type = await fetch('http://localhost:8080/api/v1/items-type/',{
-           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          }
-        });
-        const items_type_response = await items_type.json();
-        setItemsType(items_type_response.data);
+        const [businessTypeRes, itemsTypeRes] = await Promise.all([
+          fetch('http://localhost:8080/api/v1/business-type/', {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          }),
+          fetch('http://localhost:8080/api/v1/items-type/', {
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          }),
+        ]);
 
-        setLoading(false);
+        const businessTypeData = await businessTypeRes.json();
+        const itemsTypeData = await itemsTypeRes.json();
+
+        setBusinessType(businessTypeData.data);
+        setItemsType(itemsTypeData.data);
       } catch (error) {
         console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
     setTimeout(fetchData, 800);
-  },[])
+  }, []);
 
-  const [formData, setFormData] = useState({
-    userId:'',
-    delivery_person_id:delivery_person_id,
-    business_type: '',
-    pickup_time:'',
-    delivery_time:'',
-    business_name:'',
-    status: 'PickedUp',
-    notes: ''
-  });
+  if (!isOpen) return null;
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await onSave({ ...formData, item_details });
+      onClose();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = async(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-      // When clientType is selected, fetch client names
-  if (name === 'business_type') {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'business_type') {
     setFormData((prev) => ({ ...prev, userId: '' })); // reset clientId
     try {
      
@@ -114,10 +153,7 @@ function AddLaundry() {
 
   const handleItemChange = (index: number, field: keyof LaundryItem, value: string | number) => {
     const newItems = [...item_details];
-    newItems[index] = {
-      ...newItems[index],
-      [field]: value
-    };
+    newItems[index] = { ...newItems[index], [field]: value };
     setItem_details(newItems);
   };
 
@@ -131,61 +167,25 @@ function AddLaundry() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-  const pickup = new Date(formData.pickup_time);
-  const delivery = new Date(formData.delivery_time);
-
-  if (delivery < pickup) {
-    toast.error('Delivery date cannot be before pickup date.');
-    setLoading(false);
-    return;
-  }
-
-    try {
-      console.log('Laundry Order',JSON.stringify({
-          ...formData,
-          item_details,
-        }),)
-      const res = await fetch('http://localhost:8080/api/v1/order/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({
-          ...formData,
-          item_details,
-        }),
-      });
-    
-      const data = await res.json();
-    
-      if (!res.ok) {
-        const errorMessage = data.message || res.statusText;
-        throw new Error(errorMessage); // Just throw, don't toast here
-      }
-        toast.success('Order created successfully!');
-        setTimeout(() => navigate('/orders'), 1500);
-      } catch (err: any) {
-        toast.error(err.message || 'Error creating Orders'); // Toast only once here
-      } finally {
-        setLoading(false);
-      }
-    
-  };
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Add New Laundry Order</h1>
-      </div>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Edit Order 
+            </h3>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-gray-500"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Client Type
               </label>
@@ -310,16 +310,7 @@ function AddLaundry() {
               </div>
             ))}
           </div>
-          <div>
-              <input
-                type="hidden"
-                name="delivery_person_id"
-                required
-                value={formData.delivery_person_id}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-              />
-            </div>
+          
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Notes
@@ -333,26 +324,18 @@ function AddLaundry() {
               placeholder="Add any special instructions or notes..."
             />
           </div>
-
-          <div className="flex justify-between items-center pt-6 border-t border-gray-200 dark:border-gray-700">
-            {/*<div className="text-lg font-medium">
-              Total Amount: <span className="text-blue-600 dark:text-blue-400">
-                ${items.reduce((sum, item) => sum + (item.quantity * item.price), 0).toFixed(2)}
-              </span>
-            </div>*/}
-            
-            <div className="flex gap-3">
+            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 type="button"
-                onClick={() => navigate('/orders')}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 text-sm transition-colors duration-200"
+                onClick={onClose}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm transition-colors duration-200 disabled:bg-blue-400 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-md transition-colors duration-200 disabled:bg-primary-light disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -362,16 +345,16 @@ function AddLaundry() {
                 ) : (
                   <>
                     <Save size={16} />
-                    <span>Create Order</span>
+                    <span>Save Changes</span>
                   </>
                 )}
               </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
 }
 
-export default AddLaundry;
+export default EditOrderModel;

@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
-import { PlusCircle, Search, Filter, Check, X } from 'lucide-react';
-import { mockOrders } from '../utils/mockData';
+import { PlusCircle, Search, Filter, Check, X, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import { toast } from 'react-toastify';
+import EditOrderModal from '../pages/delivery/EditOrderModel';
 
 // Define types for our orders
-type OrderStatus = 'pending' | 'picked_up' | 'in_process' | 'completed';
-
+type OrderStatus = 'picked_up' | 'completed' | 'in_process' | 'pending';
+interface LaundryItem {
+  item_name: string;
+  quantity: number;
+}
 interface Order {
+  _id: string; // ✅ Add this line
   id: string;
   client: string;
   clientType: 'hospital' | 'hotel' | 'salon';
@@ -18,53 +22,132 @@ interface Order {
   address: string;
   contactPerson: string;
   contactNumber: string;
+  notes: string;
+  item_details: LaundryItem[];
+  userId: string;
+  delivery_person_id: string;
+  business_type: string;
+  pickup_time: string;
+  delivery_time: string;
+  business_name: string;
 }
-
+interface EditOrder{
+  _id:string;
+  userId:string;
+  delivery_person_id:string;
+  business_type:string;
+  pickup_time:Date;
+  delivery_time:Date;
+  item_details:[];
+  status:string;
+  notes:string;
+}
 function Orders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [editorders, setEditOrders] = useState<EditOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [updateStatusLoading, setUpdateStatusLoading] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
-    // Simulate loading orders from an API
-    setTimeout(() => {
-      setOrders(mockOrders);
-      setLoading(false);
-    }, 800);
+    const fetchOrders = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/v1/order/');
+        const data = await res.json();
+
+        const mappedOrders: Order[] = data.map((order: any) => ({
+          id: order._id,
+          client: order.userId?.business_name || order.userId?.name || 'Unknown',
+          clientType: order.userId?.business_type,
+          items: order.item_details.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0),
+          status: mapStatus(order.status),
+          date: new Date(order.pickup_time).toLocaleDateString(),
+          address: order.userId?.business_address,
+          contactPerson: order.userId?.name || 'N/A',
+          contactNumber: order.userId?.business_phone || 'N/A',
+          notes: order.notes || 'N/A'
+        }));
+
+        setOrders(mappedOrders);
+      } catch (err) {
+        console.error('Failed to fetch orders:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    setTimeout(fetchOrders, 800);
   }, []);
 
+  const mapStatus = (status: string): OrderStatus => {
+    switch (status.toLowerCase()) {
+      case 'pickedup': return 'picked_up';
+      case 'completed': return 'completed';
+      case 'in_process': return 'in_process';
+      default: return 'pending';
+    }
+  };
+
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         order.id.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    const matchesSearch =
+      order.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const handleStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
-    setUpdateStatusLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      setOrders(orders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      ));
+  const handleStatusUpdate = async(orderId: string, newStatus: OrderStatus) => {
+     setUpdateStatusLoading(true);
+    console.log(newStatus,'newstatue');
+  try {
+    const response = await fetch(`http://localhost:8080/api/v1/order/update-status/${orderId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newStatus }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      toast.success(result.message);
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
       setModalOpen(false);
       setSelectedOrder(null);
-      setUpdateStatusLoading(false);
-    }, 800);
+    } else {
+      console.error('Status update failed:', result.error);
+    }
+  } catch (err) {
+    console.error('Error:', err);
+  } finally {
+    setUpdateStatusLoading(false);
+  }
   };
 
   const openOrderDetails = (order: Order) => {
     setSelectedOrder(order);
     setModalOpen(true);
   };
-
+  const handleEdit = (order: Order) => {
+    setEditOrders(order);
+    console.log(order,'order_dataaaa')
+    setEditModalOpen(true);
+  };
+  const handleSaveEdit = async (order: Order) => {
+      
+    };
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -158,7 +241,7 @@ function Orders() {
                 filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
-                      #{order.id}
+                      #{filteredOrders.length}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       {order.client}
@@ -193,7 +276,14 @@ function Orders() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       {order.date}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-left flex gap-2">
+                      <button 
+                        onClick={() => handleEdit(order)}
+                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                      >
+                         <Edit size={18} />
+                      </button>
+                      |
                       <button 
                         onClick={() => openOrderDetails(order)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
@@ -271,6 +361,10 @@ function Orders() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">Items</p>
                 <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.items} items</p>
               </div>
+              <div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Any Instruction</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedOrder.notes}</p>
+              </div>
               
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <h4 className="font-medium text-gray-900 dark:text-white mb-3">Update Status</h4>
@@ -331,6 +425,17 @@ function Orders() {
           </div>
         </div>
       )}
+
+        {/* Edit Client Modal */}
+      
+ <EditOrderModal
+  isOpen={editModalOpen}
+  onClose={() => {
+    setEditModalOpen(false);
+  }}
+  onSave={handleSaveEdit}
+  data={editorders}
+ />
     </div>
   );
 }

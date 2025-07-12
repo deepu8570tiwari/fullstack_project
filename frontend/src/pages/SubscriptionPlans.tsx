@@ -27,6 +27,7 @@ interface Plan {
 
 function SubscriptionPlans() {
   const { user } = useAuth();
+ 
   const selectedType = user?.role;
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly');
   const [showModal, setShowModal] = useState(false);
@@ -34,12 +35,11 @@ function SubscriptionPlans() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const token = localStorage.getItem('authToken');
+    if (!token || !selectedType) return;
+    const decoded = jwtDecode<DecodedToken>(token);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token || !selectedType) return;
-
-    const decoded = jwtDecode<DecodedToken>(token);
     fetch(`http://localhost:8080/api/v1/subscription-plans/${selectedType.toLowerCase()}`)
       .then((res) => res.json())
       .then((data) => setPlans(data))
@@ -60,7 +60,7 @@ function SubscriptionPlans() {
       const priceId =selectedPlan.stripePriceId;
 
       await createSubscription({
-        userId: user.id,
+        userId: decoded.userId,
         email: user.email,
         priceId,
         planName: selectedPlan.plan_name,
@@ -69,7 +69,7 @@ function SubscriptionPlans() {
 
       // toast will be triggered inside `createSubscription`
       setShowModal(false);
-      navigate('/dashboard');
+      navigate('/subscription-history');
     } catch (error) {
       toast.error('Failed to process subscription. Please try again.');
     } finally {
