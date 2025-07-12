@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Package, Users, User, Settings, X, CreditCard, Truck, Wallet, MessageSquare, HelpCircle, Shield, BarChart3, FileText } from 'lucide-react';
+import { Home, Package, Users, User, Settings, X, CreditCard, Truck, Wallet, HelpCircle, Shield, BarChart3, FileText } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
@@ -9,7 +9,7 @@ interface SidebarProps {
 
 function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
   const { user } = useAuth();
-
+  const year = new Date().getFullYear();
   // Define navigation links based on user role
   const getNavigationLinks = () => {
     const baseLinks = [
@@ -23,7 +23,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       { path: '/admin/reports', label: 'Reports', icon: <FileText size={20} />, roles: ['admin'] },
       
       // Manager links
-      { path: '/orders', label: 'Orders', icon: <Package size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college'] },
+      { path: '/orders', label: 'Orders', icon: <Package size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
       { path: '/clients', label: 'Clients', icon: <Users size={20} />, roles: ['admin'] },
       { path: '/admin/business-type', label: 'Business Type', icon: <Users size={20} />, roles: ['admin'] },
       { path: '/admin/items-type', label: 'Items Type', icon: <Users size={20} />, roles: ['admin'] },
@@ -32,7 +32,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       { path: '/subscription-plans', label: 'Subscription Plans', icon: <CreditCard size={20} />, roles: ['salon','hospital','hostel','college','air-bnb','flat-owner'] },
       { path: '/subscription-history', label: 'Subscription History', icon: <Wallet size={20} />, roles:['salon','hospital','hostel','college','air-bnb','flat-owner']},
       // Common links
-      { path: '/support', label: 'Support', icon: <MessageSquare size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
+      //{ path: '/support', label: 'Support', icon: <MessageSquare size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
       { path: '/faq', label: 'FAQ', icon: <HelpCircle size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
       { path: '/profile', label: 'Profile', icon: <User size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] },
       { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: ['admin', 'delivery','salon','hospital','hostel','college','air-bnb','flat-owner'] }
@@ -54,6 +54,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       case 'hospital': return 'Hospital Owner';
       case 'hotel': return 'Hotel Owner';
       case 'hostel': return 'Hostel Owner';
+      case 'flat-owner': return 'Flat Owner';
       default: return role;
     }
   };
@@ -67,7 +68,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
       case 'hotel': return 'text-green-300';
       case 'hostel': return 'text-blue-300';
       case 'hospital': return 'text-green-300';
-      default: return 'text-primary-light';
+      default: return 'text-primary-300';
     }
   };
 
@@ -88,7 +89,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
         <div className="flex items-center justify-between p-4 border-b border-primary-dark">
           <div className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center">
-              <Package size={18} className="text-primary" />
+              <img className="text-primary" src="./src/image/favicon.png"/>
             </div>
             <h2 className="text-xl font-bold">Washing Doctor</h2>
           </div>
@@ -109,7 +110,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
               className="h-10 w-10 rounded-full object-cover border-2 border-white"
             />
             <div>
-              <p className="font-medium">{user?.name}</p>
+              <p className="font-medium">{user?.name.toUpperCase()}</p>
               <p className={`text-sm ${getRoleColor(user?.role || '')}`}>
                 {getRoleDisplayName(user?.role || '')}
               </p>
@@ -146,7 +147,7 @@ function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
 
         <div className="absolute bottom-0 w-full p-4 border-t border-primary-dark">
           <div className="flex items-center justify-between text-sm text-primary-light">
-            <span>© 2025 LaundryHub</span>
+            <span>© {year} LaundryHub</span>
             <span>v1.0.0</span>
           </div>
         </div>

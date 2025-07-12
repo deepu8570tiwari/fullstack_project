@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Search, PlusCircle, Building, XCircle,Eye,ArrowUpCircle,Settings, Edit } from 'lucide-react';
+import { Search, PlusCircle, Building, XCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import DeleteConfirmationModal from '../components/modals/Subscriptions/DeleteSubscriptionHistoryModal';
 import EditSubscriptionHistoryModal from '../components/modals/Subscriptions/EditSubscriptionHistoryModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { jwtDecode } from 'jwt-decode';
-
+import { useAuth } from '../context/AuthContext';
 interface History {
   _id: string;
   userId: string;
@@ -34,7 +34,7 @@ function SubscriptionHistory() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<History | null>(null);
-
+   const { user } = useAuth();
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
@@ -114,10 +114,12 @@ function SubscriptionHistory() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Subscription History</h1>
-        <button onClick={() => navigate('/subscription-plans')} className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors duration-200 text-sm">
+        {['admin'].includes(user?.role?.toLowerCase() ?? '') && (
+          <button onClick={() => navigate('/subscription-plans')} className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-md transition-colors duration-200 text-sm">
           <PlusCircle size={18} />
           <span>Add New Subscription</span>
         </button>
+        )}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-4">

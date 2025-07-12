@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
@@ -96,7 +95,7 @@ function Register() {
       <div className="max-w-lg w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-colors duration-200">
         <div className="bg-primary p-4 flex flex-col items-center">
           <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center mb-2">
-            <Package size={32} className="text-primary" />
+            <img className="text-primary" src="./src/image/favicon.png"/>
           </div>
           <h1 className="text-2xl font-bold text-white">Washing Doctor</h1>
           <p className="text-primary-light mt-1">Business Registration</p>

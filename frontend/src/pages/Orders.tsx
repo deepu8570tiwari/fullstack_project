@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import { PlusCircle, Search, Filter, Check, X, Edit } from 'lucide-react';
+import { PlusCircle, Search, Filter, Check, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
-import EditOrderModal from '../pages/delivery/EditOrderModel';
-
 // Define types for our orders
 type OrderStatus = 'picked_up' | 'completed' | 'in_process' | 'pending';
 interface LaundryItem {
@@ -30,40 +28,32 @@ interface Order {
   pickup_time: string;
   delivery_time: string;
   business_name: string;
+  index?: number; // 👈 Add this line
 }
-interface EditOrder{
-  _id:string;
-  userId:string;
-  delivery_person_id:string;
-  business_type:string;
-  pickup_time:Date;
-  delivery_time:Date;
-  item_details:[];
-  status:string;
-  notes:string;
-}
+
 function Orders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [editorders, setEditOrders] = useState<EditOrder | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [editModalOpen, setEditModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [updateStatusLoading, setUpdateStatusLoading] = useState(false);
   const { user } = useAuth();
-
+  //console.log(user,'UserData');
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch('http://localhost:8080/api/v1/order/');
+         let apiUrl = user?.role === 'admin'
+      ? 'http://localhost:8080/api/v1/order/'
+      : `http://localhost:8080/api/v1/order/${user?.role}`;
+        const res = await fetch(apiUrl);
         const data = await res.json();
 
         const mappedOrders: Order[] = data.map((order: any) => ({
           id: order._id,
-          client: order.userId?.business_name || order.userId?.name || 'Unknown',
+          client: order.userId?.name || 'Unknown',
           clientType: order.userId?.business_type,
           items: order.item_details.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0),
           status: mapStatus(order.status),
@@ -136,18 +126,11 @@ function Orders() {
   }
   };
 
-  const openOrderDetails = (order: Order) => {
-    setSelectedOrder(order);
+  const openOrderDetails = (order: Order, index: number) => {
+    setSelectedOrder({ ...order, index });
     setModalOpen(true);
   };
-  const handleEdit = (order: Order) => {
-    setEditOrders(order);
-    console.log(order,'order_dataaaa')
-    setEditModalOpen(true);
-  };
-  const handleSaveEdit = async (order: Order) => {
-      
-    };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -238,10 +221,10 @@ function Orders() {
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => (
+                filteredOrders.map((order,index) => (
                   <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
-                      #{filteredOrders.length}
+                      #{index + 1}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       {order.client}
@@ -277,15 +260,15 @@ function Orders() {
                       {order.date}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-left flex gap-2">
-                      <button 
+                      {/* <button 
                         onClick={() => handleEdit(order)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                       >
                          <Edit size={18} />
                       </button>
-                      |
+                      | */}
                       <button 
-                        onClick={() => openOrderDetails(order)}
+                        onClick={() => openOrderDetails(order,index)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                       >
                         Manage
@@ -304,7 +287,7 @@ function Orders() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-800 rounded-lg max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
             <div className="border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Order #{selectedOrder.id}</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Order #{(selectedOrder.index ?? 0) + 1}</h3>
               <button 
                 onClick={() => setModalOpen(false)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -428,14 +411,7 @@ function Orders() {
 
         {/* Edit Client Modal */}
       
- <EditOrderModal
-  isOpen={editModalOpen}
-  onClose={() => {
-    setEditModalOpen(false);
-  }}
-  onSave={handleSaveEdit}
-  data={editorders}
- />
+ 
     </div>
   );
 }

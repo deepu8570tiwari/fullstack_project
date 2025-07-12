@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import {toast} from 'react-toastify';
 
@@ -42,9 +41,9 @@ function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 transition-colors duration-200">
       <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-colors duration-200">
-        <div className="bg-blue-600 p-6 flex flex-col items-center">
+        <div className="bg-primary p-6 flex flex-col items-center">
           <div className="h-16 w-16 rounded-full bg-white flex items-center justify-center mb-4">
-            <Package size={32} className="text-blue-600" />
+            <img className="text-primary" src="./src/image/favicon.png"/>
           </div>
           <h1 className="text-2xl font-bold text-white">Washing Doctor</h1>
           <p className="text-blue-200 mt-1">Laundry Personnel Portal</p>
@@ -72,9 +71,6 @@ function Login() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 placeholder="your@email.com"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                Demo: demo@example.com / password
-              </p>
             </div>
             
             <div className="mb-6">
@@ -96,8 +92,8 @@ function Login() {
               disabled={isLoading}
               className={`w-full py-2 px-4 rounded-md text-white font-medium transition-colors duration-200 ${
                 isLoading
-                  ? 'bg-blue-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                  ? 'bg-primary cursor-not-allowed'
+                  : 'bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
               }`}
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
@@ -107,7 +103,7 @@ function Login() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Don't have an account?{' '}
-              <Link to="/register" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
+              <Link to="/register" className="text-primary-600 hover:text-blue-500 dark:text-blue-400 font-medium">
                 Sign up
               </Link>
             </p>

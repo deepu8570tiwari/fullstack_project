@@ -1,4 +1,4 @@
-import { Bell, Moon, Sun, Menu } from 'lucide-react';
+import { Moon, Sun, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -20,10 +20,6 @@ function Header({ toggleSidebar }: HeaderProps) {
     navigate('/login');
   };
 
-  const toggleNotifications = () => {
-    setNotificationsOpen(!notificationsOpen);
-    if (profileMenuOpen) setProfileMenuOpen(false);
-  };
 
   const toggleProfileMenu = () => {
     setProfileMenuOpen(!profileMenuOpen);
@@ -41,9 +37,7 @@ function Header({ toggleSidebar }: HeaderProps) {
           >
             <Menu size={24} />
           </button>
-          <h1 className="text-xl font-semibold text-dark dark:text-white md:text-2xl">
-             Admin
-          </h1>
+          
         </div>
 
         <div className="flex items-center gap-3">

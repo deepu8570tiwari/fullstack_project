@@ -1,8 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Calendar, ClipboardList, TrendingUp, Users, ArrowUp, ArrowDown } from 'lucide-react';
-import { mockOrders, mockClients } from '../utils/mockData';
+import { Calendar, ClipboardList, TrendingUp, Users } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import {mockClients } from '../utils/mockData';
+type OrderStatus = 'picked_up' | 'completed' | 'in_process' | 'pending';
+interface LaundryItem {
+  item_name: string;
+  quantity: number;
+}
+interface Order {
+  _id: string; // ✅ Add this line
+  id: string;
+  client: string;
+  clientType: 'hospital' | 'hotel' | 'salon';
+  items: number;
+  status: OrderStatus;
+  date: string;
+  address: string;
+  contactPerson: string;
+  contactNumber: string;
+  notes: string;
+  item_details: LaundryItem[];
+  userId: string;
+  delivery_person_id: string;
+  business_type: string;
+  pickup_time: string;
+  delivery_time: string;
+  business_name: string;
+}
 function Dashboard() {
-  
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [orderStats, setOrderStats] = useState({
     total: 0,
     pending: 0,
@@ -10,28 +37,68 @@ function Dashboard() {
     inProgress: 0
   });
   const [loading, setLoading] = useState(true);
+    useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      let apiUrl =
+        user?.role === 'admin'
+          ? 'http://localhost:8080/api/v1/order/'
+          : `http://localhost:8080/api/v1/order/${user?.role}`;
 
-  useEffect(() => {
-    // Simulate API data loading
-    setTimeout(() => {
-      const pending = mockOrders.filter(order => order.status === 'pending').length;
-      const completed = mockOrders.filter(order => order.status === 'completed').length;
-      const inProgress = mockOrders.filter(order => 
-        order.status === 'picked_up' || order.status === 'in_process'
+      const res = await fetch(apiUrl);
+      const data = await res.json();
+
+      const mappedOrders: Order[] = data.map((order: any) => ({
+        id: order._id,
+        client: order.userId?.name || 'Unknown',
+        clientType: order.userId?.business_type,
+        items: order.item_details.reduce(
+          (sum: number, item: any) => sum + (item.quantity || 0),
+          0
+        ),
+        status: mapStatus(order.status),
+        date: new Date(order.pickup_time).toLocaleDateString(),
+        address: order.userId?.business_address,
+        contactPerson: order.userId?.name || 'N/A',
+        contactNumber: order.userId?.business_phone || 'N/A',
+        notes: order.notes || 'N/A'
+      }));
+
+      // ✅ Use mappedOrders directly
+      const pending = mappedOrders.filter(order => order.status === 'pending').length;
+      const completed = mappedOrders.filter(order => order.status === 'completed').length;
+      const inProgress = mappedOrders.filter(
+        order => order.status === 'picked_up' || order.status === 'in_process'
       ).length;
-      
+
       setOrderStats({
-        total: mockOrders.length,
+        total: mappedOrders.length,
         pending,
         completed,
         inProgress
       });
-      
+
+      setOrders(mappedOrders);
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+    } finally {
       setLoading(false);
-    }, 800);
-    
-  }, []);
-  
+    }
+  };
+
+  setTimeout(fetchOrders, 800);
+}, []);
+
+
+
+ const mapStatus = (status: string): OrderStatus => {
+    switch (status.toLowerCase()) {
+      case 'pickedup': return 'picked_up';
+      case 'completed': return 'completed';
+      case 'in_process': return 'in_process';
+      default: return 'pending';
+    }
+  };
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -40,7 +107,6 @@ function Dashboard() {
           <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
       </div>
-
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {loading ? (
@@ -65,13 +131,7 @@ function Dashboard() {
                   <ClipboardList size={20} />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-500 flex items-center">
-                  <ArrowUp size={12} className="mr-1" />
-                  12%
-                </span>
-                <span className="ml-2 text-gray-500 dark:text-gray-400">vs last week</span>
-              </div>
+              
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-md">
@@ -84,13 +144,7 @@ function Dashboard() {
                   <Calendar size={20} />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-red-500 flex items-center">
-                  <ArrowDown size={12} className="mr-1" />
-                  3%
-                </span>
-                <span className="ml-2 text-gray-500 dark:text-gray-400">vs last week</span>
-              </div>
+              
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-md">
@@ -103,15 +157,10 @@ function Dashboard() {
                   <TrendingUp size={20} />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-500 flex items-center">
-                  <ArrowUp size={12} className="mr-1" />
-                  8%
-                </span>
-                <span className="ml-2 text-gray-500 dark:text-gray-400">vs last week</span>
-              </div>
+              
             </div>
 
+             {['admin'].includes(user?.role?.toLowerCase() ?? '') && (
             <div className="bg-white dark:bg-gray-800 rounded-lg p-5 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-md">
               <div className="flex justify-between">
                 <div>
@@ -122,14 +171,9 @@ function Dashboard() {
                   <Users size={20} />
                 </div>
               </div>
-              <div className="mt-4 flex items-center text-xs">
-                <span className="text-green-500 flex items-center">
-                  <ArrowUp size={12} className="mr-1" />
-                  4%
-                </span>
-                <span className="ml-2 text-gray-500 dark:text-gray-400">vs last month</span>
-              </div>
+           
             </div>
+             )}
           </>
         )}
       </div>
@@ -173,10 +217,10 @@ function Dashboard() {
                   </tr>
                 ))
               ) : (
-                mockOrders.slice(0, 5).map((order) => (
+                orders.slice(0, 5).map((order,index) => (
                   <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-white">
-                      #{order.id}
+                      #{index + 1}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                       {order.client}

@@ -198,7 +198,7 @@ function AddLaundry() {
               >
               <option value="">Select any Client Type</option>
                {BusinessType.map((businesstype) => (
-                <option key={businesstype._id} value={businesstype.business_type}>
+                <option key={businesstype._id} value={businesstype.business_type.toLowerCase()}>
                   {businesstype.business_type}
                 </option>
               ))}
