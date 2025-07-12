@@ -7,7 +7,8 @@ router
     .post('/', UserSubscriptionController.createUserSubscription)
     .get('/', UserSubscriptionController.getAllUserSubscription)
     .get('/:userId', UserSubscriptionController.getSingleSubscriptionPlans)
-    .put('/:id', UserSubscriptionController.updateUserSubscription)
+    .put('/:id', UserSubscriptionController.upgradeUserSubscription)
+    .post('/:subscriptionId',UserSubscriptionController.cancelUserSubscription)
     .delete('/:id', UserSubscriptionController.deleteUserSubscription);
 
 module.exports = router;

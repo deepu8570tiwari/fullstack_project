@@ -18,7 +18,7 @@ exports.signupschema=Joi.object({
     }),
     business_type: Joi
         .string()
-        .valid('admin', 'manager','salon', 'hospital', 'hotel','delivery').required(),
+        .valid('admin', 'manager','salon', 'hospital', 'hotel','delivery','air-bnb','flat-owner').required(),
         business_name:Joi.when('business_type', {
         is: Joi.valid('salon', 'hospital', 'hotel'),  // For these roles, businessName is required
         then: Joi.string().min(2).max(100).required().messages({

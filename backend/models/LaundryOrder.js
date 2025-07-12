@@ -1,17 +1,17 @@
 const mongoose=require('mongoose');
 const LaundryOrderSchema = new mongoose.Schema({
-  client_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
-  delivery_person_id: { type: mongoose.Schema.Types.ObjectId, ref: 'DeliveryPerson' },
-  category: { type: String, enum: ['Salon', 'Hotel', 'Hospital'], required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true },
+  delivery_person_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' },
+  business_type: { type: String, required: true },
+  pickup_time: Date,
+  delivery_time: Date,
   item_details: [
     {
       item_name: String,
       quantity: Number
     }
   ],
-  pickup_time: Date,
-  delivery_time: Date,
-  status: { type: String, enum: ['Pending', 'Picked up', 'Delivered', 'Cancelled'], default: 'Pending' },
+  status: { type: String, enum: ['Pending', 'PickedUp', 'Delivered', 'Cancelled'], default: 'PickedUp' },
   notes: String,
   received_by: String
 },{ timestamps: true });

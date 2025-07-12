@@ -10,7 +10,7 @@ const AdminSchema = new mongoose.Schema({
   },
   business_type: { 
     type: String, 
-    enum: ['admin', 'manager', 'salon', 'hospital', 'hotel','delivery'], 
+    enum: ['admin', 'manager', 'salon', 'hospital', 'hotel','delivery','air-bnb','flat-owner'], 
     default: 'Client' 
   },
   business_address: { 

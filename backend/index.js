@@ -18,7 +18,10 @@ const authMiddleware = require('./middlewares/authmiddle');
 const checkRole = require('./middlewares/roleCheck');
 const SubscriptionPlan=require('./routes/subscriptionPlanRoutes')
 const UserSubscription=require('./routes/userSubscription');
-
+const stripeWebhook = require('./webhooks/stripeWebhookHandler');
+const addLaundry=require('./routes/addLaundry');
+// ✅ 1. Stripe Webhook FIRST (before body parsers)
+server.use('/api/v1/webhook', stripeWebhook);  // Must use express.raw()
 
 // Middleware
 server.use(cors());
@@ -44,8 +47,8 @@ server.use('/api/v1/business-type',authMiddleware, checkRole('admin', 'delivery'
 server.use('/api/v1/items-type',authMiddleware, checkRole('admin', 'delivery'), Itemtype)
 server.use('/api/v1/subscription-plans',SubscriptionPlan)
 server.use('/api/v1/user-subscription',UserSubscription)
-const stripeWebhook = require('./webhooks/stripeWebhookHandler');
-server.use('/stripe', stripeWebhook); // Handles POST /stripe/webhook
+server.use('/api/v1/order',addLaundry)
+
 
 server.listen(8080, () => {
   console.log('Server is running on http://localhost:8080');
