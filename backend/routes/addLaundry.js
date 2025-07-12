@@ -4,7 +4,7 @@ const router=express.Router();
 router
     .post('/',LaundryController.createOrder)
     .get('/',LaundryController.getAllOrders)
-    .get('/:orderId',LaundryController.getSingleOrders)
+    .get('/:slug',LaundryController.getSingleOrders)
     .put('/update-status/:orderId',LaundryController.updateOrderStatus)
     .put('/:id',LaundryController.updateOrder)
     .delete('/:id',LaundryController.deleteOrder)

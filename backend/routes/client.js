@@ -8,8 +8,8 @@ router
   .get('/delivery',clientController.getonlyDelivery)
   .get('/getclientbytype/:business_type',clientController.getClientbyType)
   .get('/:id', clientController.getClient)
-  .put('/:id', clientController.replaceClient)
-  .patch('/:id', clientController.updateClient)
+  .put('/:id', clientController.updateClient)
+  .patch('/:id', clientController.replaceClient)
   .delete('/:id', clientController.deleteClient);
 
 module.exports = router;

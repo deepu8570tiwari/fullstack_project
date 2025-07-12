@@ -66,7 +66,6 @@ try {
 exports.updateSubscriptionPlan = async (req, res) => {
 
  try {
-  console.log(req.body);
     const updatedPlan = await SubscriptionPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updatedPlan);
   } catch (err) {

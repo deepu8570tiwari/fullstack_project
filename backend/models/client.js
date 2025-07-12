@@ -1,16 +1,3 @@
-// const mongoose=require('mongoose');
-// const clientSchema = new mongoose.Schema({
-//     business_name: { type: String,required: true},
-//     business_type: { type: String, enum: ['hospital', 'salon', 'hotel'], default: 'hospital'},
-//     business_address: { type: String, required: true},
-//     contactPerson: { type: String, required: true },
-//     contactEmail: { type: String, required: true },
-//     contactPhone: { type: String, required: true },
-//     createdAt: { type: Date, default: Date.now }
-//   });
-  
-//   module.exports = mongoose.model('Client', clientSchema);
-
 const mongoose=require('mongoose');
 
 const clientSchema = new mongoose.Schema({

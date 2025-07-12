@@ -37,16 +37,16 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 };
-exports.getSingleOrders=async(req,res)=>{
+exports.getSingleOrders = async (req, res) => {
   try {
-      const getSingleOrder=await Order.findById(req.params.id);
-      if(!getSingleItemType)
-          res.status(402).json({message:"Oops something went wrong. try with different Id"});
-      res.status(201).json({message:"Get single data by Id",data:getSingleOrder});
-      } catch (error) {
-          res.status(404).error({err:message})
-      }
-}
+    const getSingleOrder = await Order.find({ business_type: req.params.slug }).populate('userId', 'name business_name business_type business_address business_phone');;
+    return res.status(200).json(getSingleOrder); // empty [] if no match
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 exports.updateOrder = async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(req.params.id, req.body, { new: true });

@@ -52,8 +52,24 @@ exports.replaceClient = async (req, res) => {
 };
 
 exports.updateClient = async (req, res) => {
-  const client = await Client.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.status(200).json(client);
+  try {
+    const client = await Client.findById(req.params.id);
+    if (!client) {
+      return res.status(404).json({ message: 'Client not found' });
+    }
+    // 🔁 Update only fields that exist in req.body (non-undefined)
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] !== undefined) {
+        client[key] = req.body[key];
+      }
+    });
+
+    const updatedClient = await client.save();
+
+    res.status(200).json(updatedClient);
+  } catch (err) {
+    res.status(500).json({ message: 'Update failed', error: err.message });
+  }
 };
 
 exports.deleteClient = async (req, res) => {
