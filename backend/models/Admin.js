@@ -21,6 +21,10 @@ const AdminSchema = new mongoose.Schema({
     type: Number, 
     trim: true 
   },
+  avatar:{
+    type: String, 
+    trim: true 
+  },
   permissions: [String],
   verified:{
     type:Boolean,
