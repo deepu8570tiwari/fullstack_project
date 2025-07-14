@@ -5,7 +5,8 @@ const UserSubscriptionController = require('../controllers/UserSubscription');
 // Create new subscription plan
 router
     .post('/', UserSubscriptionController.createUserSubscription)
-    .get('/', UserSubscriptionController.getAllUserSubscription)
+    .get('/:slug', UserSubscriptionController.getAllUserSubscription)
+    .get('/',UserSubscriptionController.getallSubscriptionPlansPrice)
     .get('/:userId', UserSubscriptionController.getSingleSubscriptionPlans)
     .put('/:id', UserSubscriptionController.upgradeUserSubscription)
     .post('/:subscriptionId',UserSubscriptionController.cancelUserSubscription)

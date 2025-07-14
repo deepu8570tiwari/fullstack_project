@@ -41,7 +41,58 @@ exports.createUserSubscription = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+exports.getallSubscriptionPlansPrice=async(req,res)=>{
+   try {
+    // Fetch all active subscriptions
+    const subscriptions = await Subscription.find({ status: 'active' });
 
+    // Fetch all plans (you could optimize by matching only used stripePriceIds)
+    const plans = await SubscriptionPlan.find({ isActive: true });
+
+       // Map: stripePriceId → { price, business_type }
+    const planMap = {};
+    plans.forEach(plan => {
+      planMap[plan.stripePriceId] = {
+        price: plan.price,
+        business_type: plan.business_type
+      };
+    });
+
+     let totalEarnings = 0;
+
+    const earningsByType = {
+      Salon: 0,
+      Hotel: 0,
+      Hospital: 0
+    };
+
+    subscriptions.forEach(sub => {
+      const plan = planMap[sub.stripePriceId];
+      if (plan) {
+        totalEarnings += plan.price;
+        earningsByType[plan.business_type] += plan.price;
+      }
+    });
+    // Format total
+    const totalamount = `${Math.round(totalEarnings / 1000)}k`;
+    // Calculate percentage breakdown
+    const percentageByType = {};
+    for (const type of ['Salon', 'Hotel', 'Hospital','flat-owner']) {
+      const earning = earningsByType[type] || 0;
+      percentageByType[type] = totalEarnings > 0
+        ? ((earning / totalEarnings) * 100).toFixed(2) + '%'
+        : '0%';
+    }
+    res.json({
+      totalEarnings,
+      totalamount,
+      percentageByBusinessType: percentageByType
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 // 2. Get All Subscription Plans by Business Type
 exports.getAllUserSubscription = async (req, res) => {
   try {
@@ -61,6 +112,7 @@ exports.getSingleSubscriptionPlans = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // Upgrade Subscription
 exports.upgradeUserSubscription = async (req, res) => {
